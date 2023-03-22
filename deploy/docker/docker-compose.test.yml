@@ -4,7 +4,7 @@ networks:
   backend:
     driver: bridge
   frontend:
-    external:
+      external: true
       name: infrastructure
 
 services:
@@ -77,22 +77,25 @@ services:
   #     - .env
 
   # Uncomment to enable RabbitMQ
-  # rabbitmq:
-  #   image: rabbitmq:3-management
-  #   restart: always
-  #   hostname: rabbitmq
-  #   networks:
-  #     - frontend
-  #     - backend
-  #   env_file:
-  #     - .env
-  #   # Uncomment to initialize RabbitMQ with predefined configuration
-  #   # volumes:
-  #   #  - './configs/rabbitmq-init.json:/tmp/rabbitmq-init.json'
-  #   # environment:
-  #   #  - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbitmq_management load_definitions "/tmp/rabbitmq-init.json"
-
-  #   # Uncomment to expose RabbitMQ Management service port
-  #   # ports:
-  #   #  - "15672:15672"
+  rabbitmq:
+    image: rabbitmq:3-management
+    restart: always
+    hostname: rabbitmq
+    networks:
+      - frontend
+      - backend
+    env_file:
+      - .env
+    # Uncomment to initialize RabbitMQ with predefined configuration
+    volumes:
+     - './configs/rabbitmq-init.json:/tmp/rabbitmq-init.json'
+    # environment:
+    #  - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbitmq_management load_definitions "/tmp/rabbitmq-init.json"
+    environment:
+      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbitmq_management load_definitions "/tmp/rabbitmq-init.json"
+      - RABBITMQ_DEFAULT_USER=user
+      - RABBITMQ_DEFAULT_PASS=password
+    # Uncomment to expose RabbitMQ Management service port
+    ports:
+     - "15672:15672"
 

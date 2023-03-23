@@ -25,4 +25,4 @@ import { PermissionGuard } from './services/guards/permission.guard';
     },
   ],
 })
-export class AppModule {}
+export class AppModule { }

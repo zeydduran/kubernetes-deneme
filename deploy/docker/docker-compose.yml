@@ -15,6 +15,8 @@ services:
       args:
         NODE_VERSION: 14.8.0-alpine
         SERVICE_NAME: gateway
+        HTTP_PROXY: http://awora02:ORDev045@138.21.168.19:3128
+        HTTPS_PROXY: http://awora02:ORDev045@138.21.168.19:3128
     restart: always
     hostname: gateway
     env_file:
@@ -32,13 +34,16 @@ services:
       args:
         NODE_VERSION: 14.8.0-alpine
         SERVICE_NAME: example
+        HTTP_PROXY: http://awora02:ORDev045@138.21.168.19:3128
+        HTTPS_PROXY: http://awora02:ORDev045@138.21.168.19:3128
     restart: always
     hostname: example
     env_file:
       - ../../config/.env
     networks:
       - backend
-    # links:
+    links:
+      - rabbitmq
     #  - db
 
     # Uncomment to enable MongoDB
@@ -85,8 +90,8 @@ services:
       - './configs/rabbitmq-init.json:/tmp/rabbitmq-init.json'
     environment:
       - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbitmq_management load_definitions "/tmp/rabbitmq-init.json"
-      - RABBITMQ_USER=user
-      - RABBITMQ_PASSWORD=password
+      - RABBITMQ_DEFAULT_USER=user
+      - RABBITMQ_DEFAULT_PASS=password
 
     # Uncomment to expose RabbitMQ Management service port
     ports:

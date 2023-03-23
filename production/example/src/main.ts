@@ -1,19 +1,22 @@
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { Transport, TcpOptions } from '@nestjs/microservices';
+import { Transport, MicroserviceOptions } from '@nestjs/microservices';
 
 import { ExampleModule } from './example.module';
 import { ConfigService } from './services/config/config.service';
 
 async function bootstrap() {
   const configService = new ConfigService();
-  const app = await NestFactory.createMicroservice(ExampleModule, {
-    transport: Transport.TCP,
+  const app = await NestFactory.createMicroservice<MicroserviceOptions>(ExampleModule, {
+    transport: Transport.RMQ,
     options: {
-      host: configService.get('host'),
-      port: configService.get('port')
-    }
-  } as TcpOptions);
+      urls: ['amqp://user:password@rabbitmq:5672'],
+      queue: 'cats_queue',
+      queueOptions: {
+        durable: false
+      },
+    },
+  });
 
   app.useLogger(Logger);
   await app.listen();

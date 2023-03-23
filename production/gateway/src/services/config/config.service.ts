@@ -8,11 +8,15 @@ export class ConfigService {
     this.envConfig.port = process.env.API_PORT;
 
     this.envConfig.exampleService = {
+      name: 'MATH_SERVICE',
+      transport: Transport.RMQ,
       options: {
-        port: process.env.API_PORT,
-        host: process.env.EXAMPLE_SERVICE_HOST,
+        urls: ['amqp://user:password@rabbitmq:5672'],
+        queue: 'cats_queue',
+        queueOptions: {
+          durable: false
+        },
       },
-      transport: Transport.TCP,
     };
   }
 

@@ -4,5 +4,6 @@ import { Injectable } from '@nestjs/common';
 export class ExampleService {
   public async calculateExample(num: string): Promise<number> {
     return 100 + parseInt(num);
+    
   }
 }

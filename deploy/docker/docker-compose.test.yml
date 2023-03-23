@@ -4,8 +4,8 @@ networks:
   backend:
     driver: bridge
   frontend:
-      external: true
-      name: infrastructure
+    external: true
+    name: infrastructure
 
 services:
   gateway:
@@ -15,6 +15,8 @@ services:
       args:
         NODE_VERSION: 14.8.0-alpine
         SERVICE_NAME: gateway
+        HTTP_PROXY: http://awora02:ORDev045@138.21.168.19:3128
+        HTTPS_PROXY: http://awora02:ORDev045@138.21.168.19:3128
     restart: always
     hostname: ${GATEWAY_SERVICE_HOST}
     env_file:
@@ -25,8 +27,8 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - "../../production/types/:/srv/types/"
-      - "../../production/gateway/:/srv/gateway/"
+      - "../../production/types/:/usr/app/types/"
+      - "../../production/gateway/:/usr/app/gateway/"
 
   example:
     build:
@@ -35,6 +37,8 @@ services:
       args:
         NODE_VERSION: 14.8.0-alpine
         SERVICE_NAME: example
+        HTTP_PROXY: http://awora02:ORDev045@138.21.168.19:3128
+        HTTPS_PROXY: http://awora02:ORDev045@138.21.168.19:3128
     restart: always
     hostname: ${EXAMPLE_SERVICE_HOST}
     env_file:
@@ -42,41 +46,42 @@ services:
     networks:
       - backend
     volumes:
-      - "../../production/types/:/srv/types/"
-      - "../../production/example/:/srv/example/"
-    # links:
+      - "../../production/types/:/usr/app/types/"
+      - "../../production/example/:/usr/app/example/"
+    links:
+      - rabbitmq
     #  - db
 
-  # Uncomment to enable MongoDB
-  # db:
-  #   image: "mongo"
-  #   restart: always
-  #   environment:
-  #     MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER}
-  #     MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
-  #     MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
-  #     MONGO_USER: ${MONGO_USER}
-  #     MONGO_PASSWORD: ${MONGO_PASSWORD}
-  #     TZ: "Europe/Warsaw"
-  #   volumes:
-  #     - "./db/data/db-files:/data/db"
-  #     - "./db/init/:/docker-entrypoint-initdb.d/"
-  #   ports:
-  #     - 27017:27017
-  #   networks:
-  #     - backend
+    # Uncomment to enable MongoDB
+    # db:
+    #   image: "mongo"
+    #   restart: always
+    #   environment:
+    #     MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER}
+    #     MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+    #     MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
+    #     MONGO_USER: ${MONGO_USER}
+    #     MONGO_PASSWORD: ${MONGO_PASSWORD}
+    #     TZ: "Europe/Warsaw"
+    #   volumes:
+    #     - "./db/data/db-files:/data/db"
+    #     - "./db/init/:/docker-entrypoint-initdb.d/"
+    #   ports:
+    #     - 27017:27017
+    #   networks:
+    #     - backend
 
-  # Uncomment to enable redis
-  # redis:
-  #   image: redis
-  #   restart: always
-  #   hostname: redis
-  #   networks:
-  #     - backend
-  #   env_file:
-  #     - .env
+    # Uncomment to enable redis
+    # redis:
+    #   image: redis
+    #   restart: always
+    #   hostname: redis
+    #   networks:
+    #     - backend
+    #   env_file:
+    #     - .env
 
-  # Uncomment to enable RabbitMQ
+    # Uncomment to enable RabbitMQ
   rabbitmq:
     image: rabbitmq:3-management
     restart: always
@@ -88,7 +93,7 @@ services:
       - .env
     # Uncomment to initialize RabbitMQ with predefined configuration
     volumes:
-     - './configs/rabbitmq-init.json:/tmp/rabbitmq-init.json'
+      - './configs/rabbitmq-init.json:/tmp/rabbitmq-init.json'
     # environment:
     #  - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbitmq_management load_definitions "/tmp/rabbitmq-init.json"
     environment:
@@ -97,5 +102,4 @@ services:
       - RABBITMQ_DEFAULT_PASS=password
     # Uncomment to expose RabbitMQ Management service port
     ports:
-     - "15672:15672"
-
+      - "15672:15672"
